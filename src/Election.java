@@ -3,14 +3,14 @@ import java.util.stream.Collectors;
 
 public class Election {
     private Map<String, Integer> candidates;
-    private PriorityQueue<CandidateVotes> maxHeap;
+    private PriorityQueue<CandidateVotes> maxHeap; //used to get top candidates
     private int totalVotes;
-    private int p;
+    private int p; //total number of votes allowed
 
     public Election() {
         this.candidates = new HashMap<>();
         this.maxHeap = new PriorityQueue<>((a, b) -> {
-            if (b.votes != a.votes) return b.votes - a.votes;
+            if (b.votes != a.votes) return b.votes - a.votes; // sort by votes descending
             return a.candidate.compareTo(b.candidate);
         });
         this.totalVotes = 0;
@@ -37,6 +37,7 @@ public class Election {
             return false;
         }
 
+        //increment vote count
         int newVotes = candidates.get(candidate) + 1;
         candidates.put(candidate, newVotes);
         totalVotes++;
@@ -72,7 +73,6 @@ public class Election {
         totalVotes += riggedVotes;
         maxHeap.offer(new CandidateVotes(candidate, riggedVotes));
 
-        // Give 1 vote to Cole Train and 1 to Anya Stroud if possible
         List<String> others = candidates.keySet().stream()
                 .filter(c -> !c.equals(candidate))
                 .collect(Collectors.toList());
@@ -93,6 +93,7 @@ public class Election {
     }
 
     public List<String> getTopKCandidates(int k) {
+        // Sort candidates by votes and name and return top-k names
         return candidates.entrySet().stream()
                 .sorted((a, b) -> {
                     int voteCompare = b.getValue().compareTo(a.getValue());
@@ -104,6 +105,7 @@ public class Election {
     }
 
     public void auditElection() {
+        // Print all candidates and their votes in sorted order
         candidates.entrySet().stream()
                 .sorted((a, b) -> {
                     int voteCompare = b.getValue().compareTo(a.getValue());

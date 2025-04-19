@@ -3,9 +3,9 @@ import java.util.stream.Collectors;
 
 public class ExtraCredElection {
     private Map<String, Integer> candidates;
-    private PriorityQueue<CandidateVotes> maxHeap;
+    private PriorityQueue<CandidateVotes> maxHeap; //max-heap to sort top candidates
     private int totalVotes;
-    private int p;
+    private int p; //total votes allowed
 
     public ExtraCredElection() {
         this.candidates = new HashMap<>();
@@ -45,6 +45,7 @@ public class ExtraCredElection {
     public boolean castRandomVote() {
         if (candidates.isEmpty()) return false;
 
+        //randomly pick a candidate and vote
         List<String> candidateList = new ArrayList<>(candidates.keySet());
         String randomCandidate = candidateList.get(new Random().nextInt(candidateList.size()));
         return castVote(randomCandidate);
@@ -58,11 +59,13 @@ public class ExtraCredElection {
         }
         totalVotes = 0;
 
+        //assign majority to rigged candidate
         int otherCount = candidates.size() - 1;
         int riggedVotes = Math.max(p - otherCount, 1);
         candidates.put(candidate, riggedVotes);
         totalVotes += riggedVotes;
 
+        //give remaining votes to other candidates
         for (String c : candidates.keySet()) {
             if (!c.equals(candidate) && totalVotes < p) {
                 candidates.put(c, 1);
@@ -70,6 +73,7 @@ public class ExtraCredElection {
             }
         }
 
+        //rebuild heap
         maxHeap.clear();
         for (Map.Entry<String, Integer> entry : candidates.entrySet()) {
             maxHeap.offer(new CandidateVotes(entry.getKey(), entry.getValue()));
@@ -79,6 +83,7 @@ public class ExtraCredElection {
     }
 
     public List<String> getTopKCandidates(int k) {
+        //return top candidate sorted by vote and name
         return candidates.entrySet().stream()
                 .sorted((a, b) -> {
                     int cmp = b.getValue().compareTo(a.getValue());
